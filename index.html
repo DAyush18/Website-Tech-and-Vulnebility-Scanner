@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Vulnerability Checker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e2e;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #2b2b3b;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            font-size: 24px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            background: #ff6b6b;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #ff3b3b;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #3b3b5c;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .vulnerability {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-top: 10px;
+        }
+        .solution {
+            font-size: 16px;
+            color: #8ecae6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Website Vulnerability Checker</h1>
+        <input type="text" id="website" placeholder="Enter website URL">
+        <button onclick="analyzeWebsite()">Check Vulnerabilities</button>
+        <div id="output" class="result"></div>
+    </div>
+
+    <script>
+        async function analyzeWebsite() {
+            const website = document.getElementById("website").value;
+            if (!website) {
+                alert("Please enter a website URL");
+                return;
+            }
+
+            document.getElementById("output").innerHTML = "Analyzing...";
+
+            const response = await fetch("http://localhost:5000/analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ website })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                document.getElementById("output").innerHTML = `<p style='color:red;'>Error: ${data.error}</p>`;
+                return;
+            }
+
+            let resultHTML = `<h3>Vulnerabilities for ${data.website}</h3>`;
+            const vulnerabilities = data.vulnerabilities.split('\n');
+            vulnerabilities.forEach(line => {
+                if (line.startsWith("*")) {
+                    resultHTML += `<p class='vulnerability'>${line.replace("*", "")}</p>`;
+                } else if (line.startsWith("**")) {
+                    resultHTML += `<p class='solution'>${line.replace("**", "")}</p>`;
+                }
+            });
+
+            document.getElementById("output").innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>
