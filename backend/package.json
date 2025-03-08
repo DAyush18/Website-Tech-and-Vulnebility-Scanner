@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "@google/generative-ai": "^0.24.0",
     "axios": "^1.8.2",
     "cors": "^2.8.5",
